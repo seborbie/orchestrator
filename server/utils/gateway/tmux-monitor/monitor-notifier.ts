@@ -18,12 +18,12 @@ export class TmuxMonitorNotifier {
     try {
       await notificationCenter.publish({
         key: `tmux-monitor:${monitor.userId}:${monitor.id}:completed`,
-        title: `Tmux 任务已结束 · ${firstNonEmptyString([host.name, host.sshHost]) ?? String(host.id)} · ${monitor.sessionName}`,
+        title: `Tmux task ended · ${firstNonEmptyString([host.name, host.sshHost]) ?? String(host.id)} · ${monitor.sessionName}`,
         body: [
-          `Host：${firstNonEmptyString([host.name, host.sshHost]) ?? String(host.id)}`,
-          `Thread：${threadLabel(monitor)}`,
-          `Tmux：${monitor.sessionName}`,
-          `状态：${reasonLabel(monitor)}`,
+          `Host: ${firstNonEmptyString([host.name, host.sshHost]) ?? String(host.id)}`,
+          `Thread: ${threadLabel(monitor)}`,
+          `Tmux: ${monitor.sessionName}`,
+          `Status: ${reasonLabel(monitor)}`,
         ].join("\n"),
         group: "tmux-monitor",
         target: {
@@ -45,22 +45,22 @@ export class TmuxMonitorNotifier {
 }
 
 function threadLabel(monitor: StoredTmuxMonitor) {
-  if (monitor.threadId === null) return "主机级监控";
+  if (monitor.threadId === null) return "Host-level monitor";
   return firstNonEmptyString([monitor.threadTitle, monitor.threadId]) ?? monitor.threadId;
 }
 
 function reasonLabel(monitor: StoredTmuxMonitor) {
   switch (monitor.completionReason) {
     case "returnedToShell":
-      return "已返回 Shell";
+      return "Returned to shell";
     case "sessionExited":
-      return "Session 已退出";
+      return "Session exited";
     case "paneExited":
-      return "Pane 已退出";
+      return "Pane exited";
     case "paneReplaced":
-      return "Pane 已被替换";
+      return "Pane was replaced";
     case "cancelled":
     case null:
-      return "监控已完成";
+      return "Monitoring completed";
   }
 }

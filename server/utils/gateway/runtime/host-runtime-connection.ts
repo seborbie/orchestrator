@@ -12,7 +12,7 @@ export async function connectHostRuntime(slot: HostRuntimeSlot, isCurrent: () =>
     hostLifecycleBus.emit({
       hostId: slot.hostId,
       status: "connecting",
-      message: `${slot.host.name || slot.host.sshHost} 正在建立后台连接`,
+      message: `${slot.host.name || slot.host.sshHost} is establishing a background connection`,
     });
     runtimeLog("host background connect", {
       userId: slot.userId,

@@ -30,7 +30,7 @@ export class CodexVersionChecker {
       hostLifecycleBus.emit({
         hostId: host.id,
         status: "upgrading",
-        message: `${hostDisplayName(host)} 的远端 Codex 安装缺失或损坏，正在重新安装 ${SUPPORTED_CODEX_VERSION}`,
+        message: `The remote Codex installation on ${hostDisplayName(host)} is missing or damaged; reinstalling ${SUPPORTED_CODEX_VERSION}`,
       });
       return "0.0.0";
     }

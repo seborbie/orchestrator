@@ -3,16 +3,39 @@ import { installRealtimeRoute } from "./realtime-route";
 
 export const E2E_USERNAME = process.env.E2E_GATEWAY_USERNAME ?? "e2e";
 export const E2E_PASSWORD = process.env.E2E_GATEWAY_PASSWORD ?? "codex-gateway-e2e-password";
+const E2E_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3100";
 const resetPages = new WeakSet<Page>();
 
 export async function openApp(
   page: Page,
-  options: { resetConfig?: boolean; interceptRealtime?: boolean } = {},
+  options: {
+    resetConfig?: boolean;
+    interceptRealtime?: boolean;
+    locale?: "en" | "zh" | null;
+  } = {},
 ) {
   // Playwright only routes WebSockets created after registration. Install a transparent pass-
   // through before the first navigation; focused tests can later intercept individual protocol
   // messages without replacing Pinia state or weakening real realtime coverage elsewhere.
   if (options.interceptRealtime !== false) await installRealtimeRoute(page);
+  // Most product-flow tests predate the English default and intentionally assert Chinese labels.
+  // Seed their initial preference without overwriting a language selected during the test. Locale
+  // coverage opts out so it can verify the real first-visit default and cookie persistence.
+  if (options.locale !== null) {
+    const localeCookie = (await page.context().cookies(E2E_BASE_URL)).find(
+      (cookie) => cookie.name === "codex-gateway-locale",
+    );
+    if (localeCookie === undefined) {
+      await page.context().addCookies([
+        {
+          name: "codex-gateway-locale",
+          value: options.locale ?? "zh",
+          url: E2E_BASE_URL,
+          sameSite: "Lax",
+        },
+      ]);
+    }
+  }
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await waitForHydratedApp(page, options);
 }

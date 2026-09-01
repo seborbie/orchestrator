@@ -21,15 +21,25 @@ test("requires bearer auth for protected HTTP APIs", async ({ page }) => {
   expect(config.version).toBe(1);
 });
 
-test("defaults to Chinese and can switch to English", async ({ page }) => {
-  await openApp(page);
+test("defaults to English and persists language choices across reloads", async ({ page }) => {
+  await openApp(page, { locale: null });
+  await expect(page.getByText("Settings")).toBeVisible();
+  await page.getByTestId("settings-toggle").click();
+  await page.getByRole("tab", { name: "Appearance" }).click();
+  await page.getByRole("combobox").first().click();
+  await page.getByRole("option", { name: "中文" }).click();
+  await expect(page.getByRole("heading", { name: "设置" })).toBeVisible();
+
+  await page.reload();
   await expect(page.getByText("设置")).toBeVisible();
   await page.getByTestId("settings-toggle").click();
   await page.getByRole("tab", { name: "外观" }).click();
   await page.getByRole("combobox").first().click();
   await page.getByRole("option", { name: "English" }).click();
   await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
-  await expect(page.getByRole("tab", { name: "Appearance" })).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText("Settings")).toBeVisible();
 });
 
 test("can revoke the current session from appearance settings", async ({ page }) => {

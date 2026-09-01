@@ -54,7 +54,7 @@ export class CodexRuntimeService {
       hostLifecycleBus.emit({
         hostId: host.id,
         status: "checkingVersion",
-        message: `正在检查 ${hostDisplayName(host)} 的远端 Codex 版本`,
+        message: `Checking the remote Codex version on ${hostDisplayName(host)}`,
       });
       const supportedVersion = SUPPORTED_CODEX_VERSION;
       const beforeVersion = await this.versionChecker.readVersionOrRecoverableMissing(host);
@@ -75,7 +75,7 @@ export class CodexRuntimeService {
         hostLifecycleBus.emit({
           hostId: host.id,
           status: "restarting",
-          message: `${hostDisplayName(host)} 的远端 Codex app-server 无法握手，正在重启：${runtimeState.versionError}`,
+          message: `The remote Codex app-server on ${hostDisplayName(host)} could not complete its handshake; restarting: ${runtimeState.versionError}`,
         });
         await this.appServerRuntime.terminateUnmanaged(host);
         return {
@@ -91,7 +91,7 @@ export class CodexRuntimeService {
         hostLifecycleBus.emit({
           hostId: host.id,
           status: "connecting",
-          message: `${hostDisplayName(host)} 的远端 Codex 已是最新版本 ${beforeVersion}`,
+          message: `Remote Codex on ${hostDisplayName(host)} is already up to date at ${beforeVersion}`,
         });
         return {
           version: beforeVersion,
@@ -107,7 +107,7 @@ export class CodexRuntimeService {
           hostLifecycleBus.emit({
             hostId: host.id,
             status: "connecting",
-            message: `${hostDisplayName(host)} 仍有活动对话，Codex ${currentRuntimeVersion} -> ${supportedVersion} 升级已延后`,
+            message: `${hostDisplayName(host)} still has an active thread; the Codex ${currentRuntimeVersion} -> ${supportedVersion} upgrade has been deferred`,
           });
           return {
             version: beforeVersion,
@@ -128,7 +128,7 @@ export class CodexRuntimeService {
       hostLifecycleBus.emit({
         hostId: host.id,
         status: "restarting",
-        message: `${hostDisplayName(host)} 的远端 Codex CLI 已是 ${beforeVersion}，正在重启旧 app-server ${currentRuntimeVersion}`,
+        message: `The remote Codex CLI on ${hostDisplayName(host)} is already at ${beforeVersion}; restarting the older app-server ${currentRuntimeVersion}`,
       });
       return {
         version: beforeVersion,
@@ -176,7 +176,7 @@ export class CodexRuntimeService {
     hostLifecycleBus.emit({
       hostId: host.id,
       status: "upgrading",
-      message: `${hostDisplayName(host)} 的远端 Codex app-server 启动失败，正在重新安装 ${SUPPORTED_CODEX_VERSION}：${messageFromError(error)}`,
+      message: `The remote Codex app-server on ${hostDisplayName(host)} failed to start; reinstalling ${SUPPORTED_CODEX_VERSION}: ${messageFromError(error)}`,
     });
 
     return await this.upgradeWorkflow.repair(host);
@@ -187,7 +187,7 @@ export class CodexRuntimeService {
     hostLifecycleBus.emit({
       hostId: host.id,
       status: "restarting",
-      message: `${hostDisplayName(host)} 的活动对话已结束，正在执行延后的 Codex 升级`,
+      message: `The active thread on ${hostDisplayName(host)} has ended; starting the deferred Codex upgrade`,
     });
     await this.appServerRuntime.terminateUnmanaged(host);
     this.clearVersionCheck(host.id);

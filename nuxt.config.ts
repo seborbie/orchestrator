@@ -44,9 +44,14 @@ export default defineNuxtConfig({
     },
   },
   i18n: {
-    defaultLocale: "zh",
+    defaultLocale: "en",
     strategy: "no_prefix",
-    detectBrowserLanguage: false,
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "codex-gateway-locale",
+      redirectOn: "root",
+      fallbackLocale: "en",
+    },
     locales: [
       { code: "zh", name: "中文", file: "zh.json" },
       { code: "en", name: "English", file: "en.json" },

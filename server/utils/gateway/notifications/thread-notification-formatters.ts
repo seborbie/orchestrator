@@ -14,8 +14,8 @@ export function threadTurnCompletedNotification(event: GatewayEvent): ServerNoti
   const status = terminalTurnStatus(turn.status);
   return {
     key: `thread-terminal:${event.hostId}:${event.threadId}:turn:${turnId}:${status}`,
-    title: `${threadTitle(event.hostId, event.threadId)} · 回合已结束`,
-    body: `${hostTitle(event.hostId)} 上的会话状态：${turnStatusLabel(status)}。可以继续输入下一步。`,
+    title: `${threadTitle(event.hostId, event.threadId)} · Turn ended`,
+    body: `Thread status on ${hostTitle(event.hostId)}: ${turnStatusLabel(status)}. You can enter the next step.`,
     group: "Codex Gateway",
     target: notificationTarget(event),
   };
@@ -29,10 +29,10 @@ export function threadGoalCompletedNotification(event: GatewayEvent): ServerNoti
   }
   return {
     key: `thread-goal:${event.hostId}:${event.threadId}:${goal.status}:${goal.updatedAt}`,
-    title: `${threadTitle(event.hostId, event.threadId)} · 目标已结束`,
+    title: `${threadTitle(event.hostId, event.threadId)} · Goal ended`,
     body: [
-      `${hostTitle(event.hostId)} 上的目标状态：${goalStatusLabel(goal.status)}。`,
-      `推进 ${formatDuration(goal.timeUsedSeconds)}，使用 ${goal.tokensUsed.toLocaleString()} tokens。`,
+      `Goal status on ${hostTitle(event.hostId)}: ${goalStatusLabel(goal.status)}. `,
+      `Ran for ${formatDuration(goal.timeUsedSeconds)} and used ${goal.tokensUsed.toLocaleString()} tokens.`,
     ].join(""),
     group: "Codex Gateway",
     target: notificationTarget(event),
@@ -50,14 +50,14 @@ export function threadUserInputRequestedNotification(event: GatewayEvent): Serve
   // itemId belongs to the thread history and survives app-server restarts. Numeric RPC ids restart
   // from zero with each process, so they are only a fallback when older payloads omit itemId.
   const requestId = idFromUnknown(params?.itemId) ?? idFromUnknown(event.payload.id) ?? event.id;
-  const questionCount = questions.length > 1 ? `（共 ${questions.length} 个问题）` : "";
+  const questionCount = questions.length > 1 ? ` (${questions.length} questions)` : "";
 
   return {
     key: `thread-user-input:${event.hostId}:${event.threadId}:${requestId}`,
-    title: `${threadTitle(event.hostId, event.threadId)} · 等待回答`,
+    title: `${threadTitle(event.hostId, event.threadId)} · Waiting for an answer`,
     // Options may contain secrets or large model-generated payloads. A push notification only
     // needs enough context to bring the user back; the interactive card remains authoritative.
-    body: `${hostTitle(event.hostId)} 上的 Agent 正在等待你的回答${questionCount}：${question ?? "请打开会话查看问题。"}`,
+    body: `The agent on ${hostTitle(event.hostId)} is waiting for your answer${questionCount}: ${question ?? "Open the thread to view the question."}`,
     group: "Codex Gateway",
     target: notificationTarget(event),
   };
@@ -105,23 +105,23 @@ function hostTitle(hostId: number) {
 
 function turnStatusLabel(status: ThreadRuntimeStatus) {
   const labels: Record<ThreadRuntimeStatus, string> = {
-    idle: "空闲",
-    running: "运行中",
-    completed: "已完成",
-    failed: "失败",
-    interrupted: "已中断",
+    idle: "idle",
+    running: "running",
+    completed: "completed",
+    failed: "failed",
+    interrupted: "interrupted",
   };
   return labels[status];
 }
 
 function goalStatusLabel(status: ThreadGoalStatus) {
   const labels: Record<ThreadGoalStatus, string> = {
-    active: "推进中",
-    paused: "已暂停",
-    blocked: "已阻塞",
-    usageLimited: "用量受限",
-    budgetLimited: "预算已用尽",
-    complete: "已完成",
+    active: "active",
+    paused: "paused",
+    blocked: "blocked",
+    usageLimited: "usage limited",
+    budgetLimited: "budget exhausted",
+    complete: "completed",
   };
   return labels[status];
 }
