@@ -143,7 +143,7 @@ done
     await hostNode.getByRole("button", { name: /立即检查/ }).click();
   }
   await expect(returnedToShell).toBeVisible();
-  const toast = page.locator("[data-sonner-toast]").filter({ hasText: "Tmux 任务已结束" });
+  const toast = page.locator("[data-sonner-toast]").filter({ hasText: "Tmux task ended" });
   await expect(toast).toBeVisible();
   await expect.poll(() => readTmuxNotifications(bark), { timeout: 30_000 }).toHaveLength(1);
   const completionNotification = (await readTmuxNotifications(bark))[0];
@@ -151,8 +151,8 @@ done
   expect(completionNotification?.title).toContain(sessionName);
   expect(completionNotification?.body).toContain(hostName);
   expect(completionNotification?.body).toContain(sessionName);
-  expect(completionNotification?.body).toContain("Thread：");
-  expect(completionNotification?.body).toContain("状态：已返回 Shell");
+  expect(completionNotification?.body).toContain("Thread:");
+  expect(completionNotification?.body).toContain("Status: Returned to shell");
   expect(completionNotification?.body).not.toContain("0.0");
 
   await page.waitForTimeout(1_000);
@@ -255,7 +255,7 @@ tmux new-session -d -s ${shellQuote(sessionName)} -n train`,
   await execRemoteSsh(remote, `tmux kill-session -t ${shellQuote(sessionName)}`);
   await hostNode.getByRole("button", { name: /立即检查/ }).click();
   await expect.poll(() => readTmuxNotifications(bark), { timeout: 30_000 }).toHaveLength(3);
-  expect((await readTmuxNotifications(bark))[2]?.body).toContain("状态：Session 已退出");
+  expect((await readTmuxNotifications(bark))[2]?.body).toContain("Status: Session exited");
 
   await execRemoteSsh(remote, `tmux new-session -d -s ${shellQuote(sessionName)} -n train`);
   await hostNode.getByRole("button", { name: `刷新 ${hostName} 的 Pane` }).click();
@@ -314,6 +314,6 @@ async function stopTmuxRun(remote: RemoteCodexEnv, sessionName: string) {
 
 async function readTmuxNotifications(bark: Awaited<ReturnType<typeof useBarkReceiver>>) {
   return (await bark.readRequests()).filter((request) =>
-    request.title.startsWith("Tmux 任务已结束"),
+    request.title.startsWith("Tmux task ended"),
   );
 }

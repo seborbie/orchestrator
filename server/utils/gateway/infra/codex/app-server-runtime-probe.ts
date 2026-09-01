@@ -60,7 +60,7 @@ export class AppServerRuntimeProbe {
     hostLifecycleBus.emit({
       hostId: host.id,
       status: "restarting",
-      message: `正在停止 ${hostDisplayName(host)} 的旧远端 Codex app-server`,
+      message: `Stopping the previous remote Codex app-server on ${hostDisplayName(host)}`,
     });
     const result = await this.ssh.exec(
       host,

@@ -8,6 +8,7 @@ import { useGatewayComposerStore } from "@/stores/gateway-composer";
 import { useGatewayNavigationStore } from "@/stores/gateway-navigation";
 
 export function useThreadSettingsControls() {
+  const { t } = useI18n();
   const gateway = useGatewayCatalogStore();
   const composer = useGatewayComposerStore();
   const navigation = useGatewayNavigationStore();
@@ -99,7 +100,9 @@ export function useThreadSettingsControls() {
   );
   const activeModelLabel = computed(() => {
     const model = activeModelRecord.value;
-    return firstNonEmptyString([model?.displayName, model?.model, activeModel.value]) ?? "模型";
+    return (
+      firstNonEmptyString([model?.displayName, model?.model, activeModel.value]) ?? t("app.model")
+    );
   });
   const activeEffortValue = computed(() => {
     if (selectedEffort.value !== "default") return selectedEffort.value;

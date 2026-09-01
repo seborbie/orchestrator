@@ -73,8 +73,8 @@ export class CodexUpgradeWorkflow {
           hostId: host.id,
           status: runtimeVersionSupported ? "connecting" : "restarting",
           message: runtimeVersionSupported
-            ? `${hostDisplayName(host)} 的远端 Codex 已是最新版本 ${beforeVersion}`
-            : `${hostDisplayName(host)} 的远端 Codex CLI 已是 ${beforeVersion}，正在重启旧 app-server ${currentRuntimeVersion}`,
+            ? `Remote Codex on ${hostDisplayName(host)} is already up to date at ${beforeVersion}`
+            : `The remote Codex CLI on ${hostDisplayName(host)} is already at ${beforeVersion}; restarting the older app-server ${currentRuntimeVersion}`,
         });
         codexUpgradeLog("installation skipped", host, {
           observedVersion: beforeVersion,
@@ -110,7 +110,7 @@ export class CodexUpgradeWorkflow {
     hostLifecycleBus.emit({
       hostId: host.id,
       status: "upgrading",
-      message: `正在为 ${hostDisplayName(host)} 准备 Codex ${supportedVersion} 官方 npm 安装包`,
+      message: `Preparing the official Codex ${supportedVersion} npm package for ${hostDisplayName(host)}`,
     });
     const version = await this.upgrader.withPreparedUpgrade(
       host,
@@ -128,7 +128,7 @@ export class CodexUpgradeWorkflow {
         hostLifecycleBus.emit({
           hostId: host.id,
           status: "upgrading",
-          message: `正在离线升级 ${hostDisplayName(host)} 的远端 Codex ${beforeVersion} -> ${supportedVersion}`,
+          message: `Upgrading remote Codex on ${hostDisplayName(host)} offline from ${beforeVersion} to ${supportedVersion}`,
         });
         return await install();
       },
@@ -142,7 +142,7 @@ export class CodexUpgradeWorkflow {
     hostLifecycleBus.emit({
       hostId: host.id,
       status: "restarting",
-      message: `${hostDisplayName(host)} 的远端 Codex 已升级到 ${version}，正在重启 app-server`,
+      message: `Remote Codex on ${hostDisplayName(host)} has been upgraded to ${version}; restarting the app-server`,
     });
     return version;
   }
@@ -152,7 +152,7 @@ export class CodexUpgradeWorkflow {
       hostLifecycleBus.emit({
         hostId: host.id,
         status: "upgrading",
-        message: `${hostDisplayName(host)} 正在等待 Codex 升级队列`,
+        message: `${hostDisplayName(host)} is waiting in the Codex upgrade queue`,
       });
     }
     return await this.queue.run(host, work);
